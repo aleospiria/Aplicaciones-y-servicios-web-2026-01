@@ -33,3 +33,18 @@ reservas_db: List[Reserva] = []
 @app.get("/")
 def home():
     return {"mensaje": "Microservicio de reservas funcionando."}
+
+@app.post("/reservas", response_model=Reserva)
+def crear_reserva(reserva: Reserva):
+
+    # Validar que no exista mismo ID
+    for r in reservas_db:
+        if r.id_reserva == reserva.id_reserva:
+            raise HTTPException(status_code=400, detail="ID de reserva ya existe")
+
+    reservas_db.append(reserva)
+    return reserva
+
+@app.get("/reservas", response_model=List[Reserva])
+def obtener_reservas():
+    return reservas_db
