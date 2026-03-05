@@ -1,41 +1,35 @@
-from fastapi import FastAPI
-from datetime import datetime
-import pandas as pd
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, Field
+from typing import List
+from datetime import date, time
+from enum import Enum
 
 app = FastAPI()
 
 
-def fibonacci(n: int):
-    if n <= 0:
-        return []
-    elif n == 1:
-        return [0]
+# Estado permitido
+class EstadoReserva(str, Enum):
+    activa = "activa"
+    cancelada = "cancelada"
+    finalizada = "finalizada"
 
-    serie = [0, 1]
-    for i in range(2, n):
-        serie.append(serie[i - 1] + serie[i - 2])
-    return serie
+
+# Modelo de datos
+class Reserva(BaseModel):
+    id_reserva: int
+    id_sala: int
+    id_usuario: int
+    fecha: date
+    hora_inicio: time
+    hora_fin: time
+    personas: int = Field(gt=0, description="Debe ser mayor que 0")
+    estado: EstadoReserva
+
+
+# Base de datos en memoria
+reservas_db: List[Reserva] = []
 
 
 @app.get("/")
 def home():
-    return {"mensaje": "API de Fibonacci funcionando correctamente."}
-
-
-@app.get("/fibonacci/{n}")
-def generar_fibonacci(n: int):
-    serie = fibonacci(n)
-    fecha = datetime.now()
-
-    df = pd.DataFrame({
-        "fecha": [fecha] * len(serie),
-        "posicion": list(range(len(serie))),
-        "valor": serie
-    })
-
-    df.to_csv("logs.txt", mode="a", index=False, header=False)
-
-    return {
-        "cantidad": n,
-        "serie": serie
-    }
+    return {"mensaje": "Microservicio de reservas funcionando."}
