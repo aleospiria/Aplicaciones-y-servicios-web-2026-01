@@ -26,7 +26,7 @@ class Reserva(BaseModel):
     estado: EstadoReserva
 
 
-# Base de datos en memoria
+# Base de datos en memoria del servidor
 reservas_db: List[Reserva] = []
 
 
